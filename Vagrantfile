@@ -53,7 +53,4 @@ Vagrant::Config.run do |config|
       ]
     end
   end
-
-  FileUtils.cp "#{host_cache_path}/admin.pem", "#{ENV['HOME']}/.chef/admin-vagrant.pem"
-
 end
