@@ -32,7 +32,7 @@ Vagrant::Config.run do |config|
     client_config.vm.provision :chef_solo do |chef|
       chef.json = {
         "chef_client" => {
-          "init_style" => "upstart",
+          "init_style" => "init",
           "server_url" => "https://192.168.168.168"
         }
       }
