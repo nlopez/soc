@@ -11,5 +11,4 @@ Gemfile.lock
 *.un~
 /cookbooks
 /bin
-validation.pem
 vendor/ruby
