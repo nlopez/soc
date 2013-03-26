@@ -1,5 +1,8 @@
 require 'berkshelf/vagrant'
 
+# Specify the number of Chef client VMs you'd like
+client_vm_count = 1
+
 # We'll mount the Chef::Config[:file_cache_path] so it persists between
 # Vagrant VMs
 host_cache_path = File.expand_path("../.cache", __FILE__)
@@ -32,25 +35,27 @@ Vagrant::Config.run do |config|
     server_config.vm.provision :shell, :path => "chef-server.sh"
   end
 
-  config.vm.define :chef_client do |client_config|
-    client_config.vm.customize ["modifyvm", :id, "--cpus", 1]
-    client_config.vm.customize ["modifyvm", :id, "--memory", 512]
-    client_config.vm.network :hostonly, "192.168.168.169"
-    client_config.vm.host_name = "chef-client"
-    client_config.vm.provision :shell, :path => "chef-client.sh"
-    client_config.vm.provision :chef_solo do |chef|
-      chef.provisioning_path = guest_cache_path
-      chef.json = {
-        "chef_client" => {
-          "init_style" => "init",
-          "server_url" => "https://192.168.168.168"
+  (1..client_vm_count).each do |i|
+    config.vm.define "chef-client-#{i}" do |client_config|
+      client_config.vm.customize ["modifyvm", :id, "--cpus", 1]
+      client_config.vm.customize ["modifyvm", :id, "--memory", 512]
+      client_config.vm.network :hostonly, "192.168.168.#{168+i}"
+      client_config.vm.host_name = "chef-client-#{i}"
+      client_config.vm.provision :shell, :path => "chef-client.sh"
+      client_config.vm.provision :chef_solo do |chef|
+        chef.provisioning_path = guest_cache_path
+        chef.json = {
+          "chef_client" => {
+            "init_style" => "init",
+            "server_url" => "https://192.168.168.168"
+          }
         }
-      }
-      chef.run_list = [
-        "recipe[chef-client::delete_validation]",
-        "recipe[chef-client::config]",
-        "recipe[chef-client::service]"
-      ]
+        chef.run_list = [
+          "recipe[chef-client::delete_validation]",
+          "recipe[chef-client::config]",
+          "recipe[chef-client::service]"
+        ]
+      end
     end
   end
 end
