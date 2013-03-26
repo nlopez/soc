@@ -1,5 +1,5 @@
 # Short Order Cook
-Creates a paired chef-server and chef-client VM using Vagrant
+Creates a chef-server and registers chef-client VMs using Vagrant
 
 ## Quick start
 
@@ -10,6 +10,8 @@ Creates a paired chef-server and chef-client VM using Vagrant
     bundle exec vagrant up
 
 Visit [the Web UI](https://192.168.168.168) and login with the default admin credentials to create a Chef API user for use with knife.
+
+Change `client_vm_count` in `Vagrantfile` to launch more than 1 chef-client.
 
 ## Purpose
 Short Order Cook lets you quickly start up a Chef server and a Chef-managed VM. This allows you to locally develop and test cookbooks, roles, and environments without losing features currently unavailable in vanilla chef-solo, such as data bag search and encrypted data bags.
