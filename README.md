@@ -8,7 +8,7 @@ Creates a chef-server and registers chef-client VMs using Vagrant
     cd soc
     ./setup.sh
 
-Change `client_vm_count` in `Vagrantfile` to launch more than 1 chef-client.
+Change `client_vm_count` in `Vagrantfile` and re-run `./setup.sh` to launch more than one chef-client.
 
 ## Purpose
 Short Order Cook lets you quickly start up a Chef server and a Chef-managed VM. This allows you to locally develop and test cookbooks, roles, and environments without losing features currently unavailable in vanilla chef-solo, such as data bag search and encrypted data bags.
