@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 error_exit() {
   echo "$1" >&2
   exit 1
@@ -25,7 +26,6 @@ else # knife.rb doesn't exist or is size=0
   echo
   echo "knife is ready for use with the SOC Chef server!"
   echo
-
 fi
 cp -f "$cache/admin.pem" "$dot_chef/admin-soc.pem"
 cp -f "$cache/validation.pem" "$dot_chef/validation-soc.pem"
