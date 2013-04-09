@@ -25,6 +25,7 @@ Vagrant::Config.run do |config|
       chef.provisioning_path = guest_cache_path
       chef.json = {
         "chef-server" => {
+          "api_fqdn" => "192.168.168.168",
           "version" => :latest
         }
       }
