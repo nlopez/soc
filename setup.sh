@@ -9,6 +9,10 @@ readonly dot_chef="$HOME/.chef"
 readonly here="$(dirname "$0")"
 readonly cache="$here/.cache"
 
+if [[ ! -e "$here/Vagrantfile" ]]; then
+  cp "$here/Vagrantfile.example" "$here/Vagrantfile"
+fi
+
 bundle check >/dev/null 2>&1 || bundle install --path vendor --local
 
 bundle exec vagrant up || error_exit "Failed to launch VMs via Vagrant"
