@@ -16,7 +16,7 @@ Vagrant::Config.run do |config|
   config.vm.box_url = "https://opscode-vm.s3.amazonaws.com/vagrant/boxes/opscode-ubuntu-12.04.box"
   config.vm.share_folder "cache", guest_cache_path, host_cache_path
 
-  config.vm.define :chef_server do |server_config|
+  config.vm.define "chef-server" do |server_config|
     server_config.vm.customize ["modifyvm", :id, "--cpus", 2]
     server_config.vm.customize ["modifyvm", :id, "--memory", 1024]
     server_config.vm.network :hostonly, "192.168.168.168"
@@ -25,7 +25,6 @@ Vagrant::Config.run do |config|
       chef.provisioning_path = guest_cache_path
       chef.json = {
         "chef-server" => {
-          "api_fqdn" => "192.168.168.168",
           "version" => :latest
         }
       }
@@ -46,17 +45,29 @@ Vagrant::Config.run do |config|
       client_config.vm.provision :chef_solo do |chef|
         chef.provisioning_path = guest_cache_path
         chef.json = {
+          "ohai" => {
+            "plugin_path" => "/var/lib/ohai/plugins"
+          },
           "chef_client" => {
-            "init_style" => "init",
-            "server_url" => "https://192.168.168.168"
+            "init_style" => "none",
+            "server_url" => "https://192.168.168.168",
+            "cron" => {
+              "use_cron_d" => true,
+              "hour" => "*",
+              "minute" => "*/10",
+              "log_file" => "/var/log/chef/client.log"
+            }
           }
         }
         chef.run_list = [
+          "recipe[ohai]",
+          "recipe[cron]",
           "recipe[chef-client::delete_validation]",
           "recipe[chef-client::config]",
-          "recipe[chef-client::service]"
+          "recipe[chef-client::cron]"
         ]
       end
+      client_config.vm.provision :shell, :inline => "chef-client"
     end
   end
 end
