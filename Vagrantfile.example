@@ -50,7 +50,9 @@ Vagrant::Config.run do |config|
           },
           "chef_client" => {
             "init_style" => "none",
-            "server_url" => "https://192.168.168.168",
+            "config" => {
+              "chef_server_url" => "https://192.168.168.168"
+            },
             "cron" => {
               "use_cron_d" => true,
               "hour" => "*",
