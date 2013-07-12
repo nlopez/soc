@@ -13,6 +13,11 @@ if [[ ! -e "$here/Vagrantfile" ]]; then
   cp "$here/Vagrantfile.example" "$here/Vagrantfile"
 fi
 
+if [[ ! -e "$cache/encrypted_data_bag_secret" ]]; then
+  echo "generating encrypted_data_bag_secret and placing it in .cache"
+  openssl rand -base64 512 > "$cache/encrypted_data_bag_secret"
+fi
+
 bundle check >/dev/null 2>&1 || bundle install --path vendor --local
 
 bundle exec vagrant up || error_exit "Failed to launch VMs via Vagrant"
@@ -33,3 +38,4 @@ else # knife.rb doesn't exist or is size=0
 fi
 cp -f "$cache/admin.pem" "$dot_chef/admin-soc.pem"
 cp -f "$cache/validation.pem" "$dot_chef/validation-soc.pem"
+
