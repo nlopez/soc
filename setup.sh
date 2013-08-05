@@ -13,6 +13,8 @@ if [[ ! -e "$here/Vagrantfile" ]]; then
   cp "$here/Vagrantfile.example" "$here/Vagrantfile"
 fi
 
+if [[ ! -e "$cache" ]]; then mkdir -vp "$cache"; fi
+
 if [[ ! -e "$cache/encrypted_data_bag_secret" ]]; then
   echo "generating encrypted_data_bag_secret and placing it in .cache"
   openssl rand -base64 512 > "$cache/encrypted_data_bag_secret"
