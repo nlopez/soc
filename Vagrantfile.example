@@ -1,5 +1,3 @@
-require 'berkshelf/vagrant'
-
 # Specify the number of Chef client VMs you'd like
 client_vm_count = 1
 
@@ -11,16 +9,19 @@ guest_cache_path = "/tmp/vagrant-cache"
 # ensure the cache path exists
 FileUtils.mkdir(host_cache_path) unless File.exist?(host_cache_path)
 
-Vagrant::Config.run do |config|
+Vagrant.configure("2") do |config|
   config.vm.box = "opscode-ubuntu-12.04"
   config.vm.box_url = "https://opscode-vm.s3.amazonaws.com/vagrant/boxes/opscode-ubuntu-12.04.box"
-  config.vm.share_folder "cache", guest_cache_path, host_cache_path
-
+  config.vm.synced_folder host_cache_path, guest_cache_path
+  config.berkshelf.enabled = true
   config.vm.define "chef-server" do |server_config|
-    server_config.vm.customize ["modifyvm", :id, "--cpus", 2]
-    server_config.vm.customize ["modifyvm", :id, "--memory", 1024]
-    server_config.vm.network :hostonly, "192.168.168.168"
-    server_config.vm.host_name = "chef-server"
+    server_config.vm.provider "virtualbox" do |vb|
+      vb.customize ["modifyvm", :id, "--cpus", 1]
+      vb.customize ["modifyvm", :id, "--memory", 512]
+    end
+    server_config.vm.network :private_network, ip: "192.168.168.168"
+    server_config.vm.hostname = "chef-server"
+    server_config.vm.provision :shell, :inline => "mkdir -p /var/chef/cache" #ugly hack for some reason first run always fails (vagrant provision chef-server fixes) TODO: fixit for realsies
     server_config.vm.provision :chef_solo do |chef|
       chef.provisioning_path = guest_cache_path
       chef.json = {
@@ -37,10 +38,12 @@ Vagrant::Config.run do |config|
 
   (1..client_vm_count).each do |i|
     config.vm.define "chef-client-#{i}" do |client_config|
-      client_config.vm.customize ["modifyvm", :id, "--cpus", 1]
-      client_config.vm.customize ["modifyvm", :id, "--memory", 512]
-      client_config.vm.network :hostonly, "192.168.168.#{168+i}"
-      client_config.vm.host_name = "chef-client-#{i}"
+      client_config.vm.provider "virtualbox" do |vb|
+        vb.customize ["modifyvm", :id, "--cpus", 1]
+        vb.customize ["modifyvm", :id, "--memory", 512]
+      end
+      client_config.vm.network :private_network, ip: "192.168.168.#{168+i}"
+      client_config.vm.hostname = "chef-client-#{i}"
       client_config.vm.provision :shell, :path => "chef-client.sh"
       client_config.vm.provision :chef_solo do |chef|
         chef.provisioning_path = guest_cache_path

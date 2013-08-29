@@ -20,9 +20,7 @@ if [[ ! -e "$cache/encrypted_data_bag_secret" ]]; then
   openssl rand -base64 512 > "$cache/encrypted_data_bag_secret"
 fi
 
-bundle check >/dev/null 2>&1 || bundle install --path vendor --local
-
-bundle exec vagrant up || error_exit "Failed to launch VMs via Vagrant"
+vagrant up || error_exit "Failed to launch VMs via Vagrant"
 
 mkdir "$dot_chef" >/dev/null 2>&1 || true
 if [ -s "$dot_chef/knife.rb" ]; then # knife.rb exists and has size>0

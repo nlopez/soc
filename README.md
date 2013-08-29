@@ -1,8 +1,16 @@
 # Short Order Cook
 Creates a chef-server and registers chef-client VMs using Vagrant
 
-## Quick start
+## Prerequisites
+Vagrant no longer offers an install via gem option.
+Install vagrant 1.2.7 from [the official vagrant site](http://downloads.vagrantup.com/tags/v1.2.7).
 
+Install vagrant-berkshelf plugin
+
+    vagrant plugin install vagrant-berkshelf
+    
+## Quick start
+    
     gem install bundler --no-rdoc --no-ri
     git clone git://github.com/thalweg/soc.git
     cd soc
